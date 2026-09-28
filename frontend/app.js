@@ -1,5 +1,3 @@
-// Set this to your public https://...vercel.app origin when hosting the frontend
-// separately. An empty string uses the same host when served at /catalog.
 const DEPLOYED_API_URL = "";
 const API_URL = DEPLOYED_API_URL.replace(/\/$/, "") ||
   (location.protocol === "file:" ? "http://127.0.0.1:8000" : location.origin);
@@ -11,7 +9,6 @@ let family = "All";
 let searchController;
 let requestNumber = 0;
 
-// Escape API strings before inserting them into HTML template literals.
 function escapeHTML(value) {
   return String(value).replace(/[&<>"']/g, ch => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[ch]));
 }
