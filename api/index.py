@@ -1,4 +1,3 @@
-"""Sillage PH: a read-only perfume discovery API adapted from the car starter."""
 from pathlib import Path
 from fastapi import FastAPI, HTTPException, Query
 from fastapi.middleware.cors import CORSMiddleware
@@ -8,7 +7,6 @@ app = FastAPI(title="Sillage PH Perfume API", description="20 luxury and designe
 app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_credentials=False,
                    allow_methods=["GET"], allow_headers=["*"])
 
-# Seven domain fields plus the technical record ID. Prices are reference values.
 perfumes = [{'id': 1,
   'name': 'Baccarat Rouge 540',
   'brand': 'Maison Francis Kurkdjian',
@@ -238,7 +236,6 @@ def home():
 def get_perfumes():
     return {"count": len(perfumes), "perfumes": perfumes}
 
-# Static /search MUST precede the dynamic /{perfume_id} route.
 @app.get("/perfumes/search", tags=["Perfumes"])
 def search_perfumes(q: str = Query(..., min_length=1, max_length=100)):
     query = q.strip().casefold()
@@ -259,7 +256,6 @@ def get_perfume(perfume_id: int):
             return perfume
     raise HTTPException(status_code=404, detail="Perfume not found.")
 
-# Serve the same three frontend files locally and on Vercel.
 FRONTEND = Path(__file__).resolve().parent.parent / "frontend"
 
 @app.get("/catalog", include_in_schema=False)
