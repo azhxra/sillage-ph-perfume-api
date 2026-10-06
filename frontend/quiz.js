@@ -85,5 +85,3 @@ async function showResults() {
     app.textContent = "We couldn't load your results. Please refresh and try again.";
   }
 }
-
-showQuestion();
