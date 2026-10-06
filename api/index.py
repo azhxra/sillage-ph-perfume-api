@@ -269,3 +269,11 @@ def stylesheet():
 @app.get("/app.js", include_in_schema=False)
 def javascript():
     return FileResponse(FRONTEND / "app.js", media_type="application/javascript")
+
+@app.get("/quiz", include_in_schema=False)
+def quiz():
+    return FileResponse(FRONTEND / "quiz.html")
+
+@app.get("/brands", include_in_schema=False)
+def brands():
+    return FileResponse(FRONTEND / "brands.html")
