@@ -43,5 +43,3 @@ async function loadBrands() {
     page.textContent = "We couldn't load the brands. Please refresh and try again.";
   }
 }
-
-loadBrands();
