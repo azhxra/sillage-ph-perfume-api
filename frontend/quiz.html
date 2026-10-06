@@ -1,0 +1,64 @@
+<!DOCTYPE html><html lang="en"><head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&family=Playfair+Display:ital,wght@0,400;0,500;1,400&display=swap">
+<style>
+:root{--ink:#33292d;--muted:#77666d;--pink:#a14e69;--blush:#fff5f7;--line:#eddfe4;--serif:'Playfair Display',Georgia,serif;--sans:'DM Sans',Arial,sans-serif}
+*{box-sizing:border-box}body{margin:0;color:var(--ink);background:#fff;font:14px/1.6 var(--sans)}
+a{color:var(--pink)}.wrap{max-width:1100px;margin:auto;padding:0 24px}
+header{display:flex;justify-content:space-between;align-items:center;height:90px}
+.wordmark{font:34px var(--serif);letter-spacing:-1.5px;text-decoration:none;color:var(--ink)}.wordmark span{font:10px var(--sans);letter-spacing:2px;margin-left:8px;color:var(--pink)}
+.back{font-size:12px;font-weight:600;text-decoration:none}
+.hero{background:var(--blush);border:1px solid #f3e6eb;padding:44px;margin-bottom:32px}
+.eyebrow{font-size:10px;font-weight:600;letter-spacing:2px;color:var(--pink);margin:0 0 14px}
+h1{font:500 clamp(30px,4vw,46px)/1.2 var(--serif);letter-spacing:-1.5px;margin:0 0 12px}h1 em{color:var(--pink);font-weight:400}
+.hero p:last-child{color:var(--muted);max-width:480px;margin:0}
+button{font:inherit;cursor:pointer}.opt,.btn{display:block;width:100%;text-align:left;border:1px solid var(--line);background:#fff;padding:14px 18px;margin-bottom:10px;font-size:13px}
+.opt:hover,.opt:focus-visible{border-color:var(--pink);background:var(--blush)}
+.btn{width:auto;display:inline-block;background:var(--pink);color:#fff;border-color:var(--pink);text-align:center}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:18px}
+.card{border:1px solid var(--line);padding:20px}.card h3{font:400 22px/1.25 var(--serif);margin:0 0 4px}
+.brand{font-size:9px;letter-spacing:1.4px;text-transform:uppercase;color:var(--pink);margin:0 0 6px}
+.notes{color:var(--muted);font-size:11px;margin:6px 0 10px}.dupe{background:#fdf6f8;padding:10px 12px;font-size:12px}
+.dupe small{display:block;font-size:8px;letter-spacing:1.1px;color:var(--pink)}
+.sub{font-size:11px;color:var(--muted)}footer{border-top:1px solid var(--line);margin-top:48px;padding:24px 0;font-size:11px;color:var(--muted)}
+</style>
+<title>Sillage PH — Find Your Scent Quiz</title></head><body>
+<div class="wrap">
+<header><a class="wordmark" href="MAIN_SITE_URL">sillage<span> / PH</span></a><a class="back" href="MAIN_SITE_URL">← Back to the collection</a></header>
+<section class="hero"><p class="eyebrow">✦ THE SCENT QUIZ</p><h1>Find the scent that is <em>perfectly you.</em></h1><p>Three quick questions. We match you to a scent family, then show the luxury perfumes and their Philippine alternatives.</p></section>
+<main id="app" aria-live="polite"></main>
+<footer>Matches are inspired alternatives, not the original perfumes. Confirm price and stock with the seller.</footer>
+</div>
+<script>
+const API="https://sillage-ph-perfume-api.vercel.app";
+const Q=[
+{q:"Pick a perfect weekend.",a:[["A beach day by the sea","Fresh"],["Garden brunch with flowers","Floral"],["Cozy café and dessert","Gourmand"],["A glamorous night out","Amber"]]},
+{q:"What would you grab at a market?",a:[["Ripe peaches and berries","Fruity"],["Citrus and fresh herbs","Fresh"],["Sandalwood and cedar","Woody"],["A leather bag","Leather"]]},
+{q:"How do you want to be remembered?",a:[["Clean and effortless","Fresh"],["Soft and romantic","Floral"],["Warm and bold","Amber"],["Sweet and playful","Fruity"]]}
+];
+const app=document.getElementById("app"),score={};let step=0;
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+function ask(){
+  const q=Q[step];
+  app.innerHTML='<p class="sub">Question '+(step+1)+' of '+Q.length+'</p><h2 style="font:400 26px var(--serif)">'+esc(q.q)+'</h2>'+
+    q.a.map((o,i)=>'<button class="opt" data-i="'+i+'">'+esc(o[0])+'</button>').join("");
+  app.querySelectorAll(".opt").forEach(b=>b.onclick=()=>{
+    const f=q.a[b.dataset.i][1];score[f]=(score[f]||0)+1;
+    ++step<Q.length?ask():result();
+  });
+}
+async function result(){
+  const top=Object.keys(score).sort((a,b)=>score[b]-score[a])[0];
+  app.textContent="Finding your scent…";
+  try{
+    const r=await fetch(API+"/perfumes");if(!r.ok)throw 0;
+    const list=(await r.json()).perfumes.filter(p=>p.scent_family===top);
+    app.innerHTML='<p class="eyebrow">YOUR SCENT FAMILY</p><h2 style="font:400 32px var(--serif);margin:0 0 18px">'+esc(top)+'</h2><div class="grid">'+
+      list.map(p=>'<article class="card"><p class="brand">'+esc(p.brand)+'</p><h3>'+esc(p.name)+'</h3><p class="notes">'+p.key_notes.map(esc).join(" · ")+
+      '</p><div class="dupe"><small>YOUR LOCAL MATCH</small><strong>'+p.dupes.map(esc).join(" / ")+'</strong><br>'+esc(p.dupe_price_php)+'</div></article>').join("")+
+      '</div><p><button class="btn" id="again" style="margin-top:20px">Retake the quiz</button></p>';
+    document.getElementById("again").onclick=()=>{step=0;for(const k in score)delete score[k];ask();};
+  }catch{app.textContent="We couldn't load your results. Please refresh and try again.";}
+}
+ask();
+</script></body></html>
