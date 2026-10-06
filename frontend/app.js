@@ -98,4 +98,3 @@ document.querySelectorAll(".filter").forEach(button => button.addEventListener("
   if (currentPerfumes.length) displayPerfumes();
 }));
 document.getElementById("docsLink").href = `${API_URL}/docs`;
-loadPerfumes();
