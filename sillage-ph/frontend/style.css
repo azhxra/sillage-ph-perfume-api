@@ -1,0 +1,259 @@
+/* ==========================================================================
+   Sillage PH — shared styles for index.html, perfume.html and compare.html
+   (quiz.html keeps its own small inline styles)
+   Sections: 1 Base · 2 Header · 3 Hero · 4 Search & filters · 5 Cards
+             6 About & footer · 7 Detail page · 8 Compare page · 9 Responsive
+   ========================================================================== */
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,500;0,600;1,400;1,500&display=swap');
+
+/* ---------- 1. Base ---------- */
+:root {
+  --ink: #33292d;
+  --muted: #77666d;
+  --pink: #a14e69;
+  --blush: #fff5f7;
+  --line: #eddfe4;
+  --serif: 'Playfair Display', Georgia, serif;
+  --sans: 'DM Sans', Arial, sans-serif;
+}
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; scroll-padding-top: 25px; }
+body { margin: 0; background: #fff; color: var(--ink); font: 14px/1.6 var(--sans); }
+a { color: inherit; text-underline-offset: 4px; }
+button, input, select { font: inherit; }
+button { cursor: pointer; }
+button:hover { filter: brightness(.94); }
+button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible, summary:focus-visible {
+  outline: 3px solid #af4d77; outline-offset: 4px;
+}
+.wrap { max-width: 1320px; margin: auto; padding: 0 44px; }
+.eyebrow { color: var(--pink); margin: 0 0 18px; font-size: 10px; font-weight: 600; letter-spacing: 2px; }
+h1 { font: 500 clamp(34px, 3.7vw, 52px)/1.17 var(--serif); letter-spacing: -1.7px; margin: 0 0 20px; }
+h1 em { color: var(--pink); font-weight: 400; }
+h2 { font: 400 28px/1.3 var(--serif); margin: 0; letter-spacing: -.6px; }
+.sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; }
+.skip { position: absolute; top: -70px; left: 20px; background: #fff; padding: 12px; z-index: 10; }
+.skip:focus { top: 10px; }
+
+/* ---------- 2. Header ---------- */
+.site-header { height: 102px; display: flex; align-items: center; justify-content: space-between; gap: 30px; }
+.wordmark { font: 38px var(--serif); letter-spacing: -1.5px; text-decoration: none; }
+.wordmark span { font: 10px var(--sans); letter-spacing: 2px; margin-left: 8px; color: var(--pink); }
+nav { display: flex; gap: 30px; font-size: 13px; }
+nav a { text-decoration: none; }
+nav a:hover { color: var(--pink); }
+.header-note { font-size: 10px; font-weight: 600; letter-spacing: 2px; color: var(--muted); }
+
+/* ---------- 3. Hero (index.html) ---------- */
+.hero { display: grid; grid-template-columns: 1.15fr 1fr; min-height: 448px; background: #fff6f8; border: 1px solid #f3e6eb; overflow: hidden; }
+.hero-copy { padding: 45px 0 33px 46px; position: relative; z-index: 1; }
+.small-star { font-size: 18px; vertical-align: middle; margin-right: 8px; }
+.intro { max-width: 420px; color: var(--muted); font-size: 13px; line-height: 1.8; margin-bottom: 20px; }
+.hero-link { display: inline-flex; gap: 40px; align-items: center; font-size: 12px; font-weight: 600; text-decoration: none; border-bottom: 1px solid #ae637b; padding-bottom: 6px; margin-right: 6px; }
+.hero-link span { font-size: 19px; }
+.hero-stats { display: flex; gap: 29px; margin-top: 30px; color: var(--muted); font-size: 10px; }
+.hero-stats strong { display: block; font: 23px var(--serif); color: var(--ink); margin-bottom: 3px; }
+
+/* Decorative bottles */
+.hero-art { position: relative; background: radial-gradient(ellipse at 50% 70%, #f3d8df 0, transparent 64%); min-height: 420px; }
+.art-caption { position: absolute; top: 32px; right: 28px; color: #956c7b; font-size: 8px; font-weight: 600; letter-spacing: 2px; }
+.orbit { position: absolute; width: 340px; height: 340px; border: 1px solid #e7c7d3; border-radius: 50%; top: 70px; left: 30px; }
+.orbit-two { width: 280px; height: 280px; top: 100px; left: 60px; }
+.hero-bottle { position: absolute; filter: drop-shadow(14px 21px 11px #845b7130); transform: rotate(-9deg); width: 137px; left: 65px; top: 106px; }
+.hero-bottle .cap { width: 66px; height: 50px; background: linear-gradient(90deg, #9a7c63, #d5bea3, #a38b75); margin: auto; border-radius: 3px 3px 0 0; }
+.glass { height: 210px; border: 2px solid #fff8; box-shadow: inset 0 0 0 5px #fff5; background: linear-gradient(105deg, #fcf3e2bd, #e4c6a987, #fae8ca); border-radius: 16px 16px 6px 6px; display: flex; align-items: center; justify-content: center; }
+.bottle-label { background: #fff9efee; width: 82%; padding: 20px 5px; font: 23px var(--serif); text-align: center; }
+.bottle-label small { display: block; font: 6px/2 var(--sans); letter-spacing: 1.2px; margin-top: 10px; }
+.bottle-front { left: 205px; top: 154px; width: 126px; transform: rotate(10deg); }
+.bottle-front .cap { background: linear-gradient(90deg, #613646, #a97384, #532f3f); width: 57px; height: 44px; }
+.bottle-front .glass { height: 166px; background: linear-gradient(105deg, #fae5eacc, #d8a6b7c9, #f2d1dc); }
+.bottle-front .bottle-label { background: #fff7f4; padding: 15px 0; }
+.art-star { position: absolute; right: 50px; top: 120px; font: 70px var(--serif); color: #bc8d9b; }
+.art-bottom { position: absolute; bottom: 23px; left: 0; right: 0; text-align: center; font: italic 12px var(--serif); color: #8b6272; }
+
+/* ---------- 4. Search & filters ---------- */
+.collection { padding-top: 48px; }
+.section-heading { display: flex; align-items: center; justify-content: space-between; gap: 20px; margin-bottom: 25px; }
+.section-heading .eyebrow { margin-bottom: 8px; font-size: 9px; }
+.collection-count { font-size: 8px; font-weight: 600; letter-spacing: 2px; color: var(--muted); }
+
+.search-bar { display: flex; align-items: center; gap: 10px; border: 1px solid var(--line); padding: 7px; background: #fff; }
+.search-icon { font-size: 26px; color: var(--pink); padding: 0 8px 0 12px; }
+.search-bar input { width: 100%; min-width: 0; border: 0; background: transparent; padding: 8px; font-size: 12px; color: var(--ink); }
+.search-bar button { white-space: nowrap; border: 1px solid var(--pink); background: var(--pink); color: #fff; padding: 10px 24px; font-size: 12px; }
+.search-bar button span { margin-left: 16px; }
+.search-bar .secondary { background: #fff; color: var(--pink); border-color: var(--line); }
+
+.filter-row { display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap; margin: 20px 0 18px; }
+.filters { display: flex; gap: 8px; flex-wrap: wrap; }
+.filter { border: 1px solid var(--line); background: #fff; color: var(--muted); border-radius: 20px; padding: 6px 17px; font-size: 11px; }
+.filter.active { background: #f9e9ef; border-color: #edd1dc; color: #8b3c58; }
+.brand-select { display: flex; align-items: center; gap: 10px; font-size: 11px; color: var(--muted); }
+.brand-select select { border: 1px solid var(--line); background: #fff; color: var(--ink); padding: 7px 12px; font-size: 12px; min-width: 210px; }
+
+.results-bar { display: flex; justify-content: space-between; align-items: center; border-top: 1px solid #f3ebee; padding: 13px 0 17px; color: var(--muted); font-size: 11px; }
+.results-bar p { margin: 0; }
+.results-bar > span { font-size: 8px; font-weight: 600; letter-spacing: 1.4px; }
+
+/* ---------- 5. Cards ---------- */
+.family-group { margin-bottom: 38px; }
+.family-title { display: flex; align-items: baseline; gap: 12px; font: 400 25px var(--serif); margin: 0 0 16px; padding-bottom: 8px; border-bottom: 1px solid var(--line); }
+.family-title small { font: 11px var(--sans); color: var(--muted); }
+.perfume-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 22px 18px; align-items: start; }
+.perfume-card { border: 1px solid var(--line); background: #fff; overflow: hidden; transition: box-shadow .2s, border-color .2s; }
+.perfume-card:hover { box-shadow: 0 8px 25px #8e627511; border-color: #dcb7c6; }
+
+.card-art { height: 150px; position: relative; background: var(--tile, #faf1f3); display: flex; align-items: center; justify-content: center; overflow: hidden; text-decoration: none; }
+.card-art::after { content: ''; position: absolute; width: 190px; height: 190px; border: 1px solid #ffffffc7; border-radius: 50%; top: 25px; right: -25px; }
+.card-number { position: absolute; top: 12px; left: 14px; font: italic 15px var(--serif); color: #9f7e8a; }
+.family-tag { position: absolute; top: 12px; right: 12px; font-size: 8px; text-transform: uppercase; letter-spacing: 1px; color: #795663; }
+.art-hint { position: absolute; bottom: 10px; left: 0; right: 0; text-align: center; font-size: 8px; letter-spacing: 1.2px; color: #795663; opacity: 0; transition: opacity .2s; }
+.card-art:hover .art-hint, .card-art:focus-visible .art-hint { opacity: 1; }
+
+.mini-bottle { position: relative; z-index: 1; filter: drop-shadow(5px 9px 5px #8e6b6d22); transform: rotate(-5deg); padding-top: 8px; }
+.mini-cap { width: 32px; height: 20px; margin: auto; background: linear-gradient(90deg, #70565b, #a48c8d, #624b51); border-radius: 2px 2px 0 0; }
+.mini-glass { width: 69px; height: 82px; border: 2px solid #fff9; border-radius: 8px 8px 4px 4px; background: linear-gradient(105deg, #fff9, var(--juice, #e8bdc8), #fff8); box-shadow: inset 0 0 0 3px #fff5; display: flex; align-items: center; justify-content: center; }
+.mini-label { width: 51px; background: #fff9f2ee; text-align: center; padding: 7px 2px; font: 11px var(--serif); }
+.mini-label small { display: block; font: 5px var(--sans); letter-spacing: 1px; margin-top: 5px; }
+.perfume-card:nth-child(3n) .mini-glass { border-radius: 28px 28px 13px 13px; }
+.perfume-card:nth-child(3n + 2) .mini-glass { width: 58px; height: 91px; }
+.perfume-card:nth-child(2n) .mini-bottle { transform: rotate(6deg); }
+
+.card-body { padding: 17px 17px 0; }
+.brand { font-size: 8px; letter-spacing: 1.4px; text-transform: uppercase; color: var(--pink); margin: 0 0 7px; min-height: 13px; }
+.card-body h3 { font: 400 21px/1.25 var(--serif); margin: 0; min-height: 53px; letter-spacing: -.4px; overflow-wrap: anywhere; }
+.notes { color: var(--muted); font-size: 10px; min-height: 32px; margin: 10px 0 12px; }
+.dupe-preview { background: #fdf6f8; padding: 10px 11px; min-height: 64px; }
+.dupe-preview small { display: block; color: var(--pink); font-size: 8px; letter-spacing: 1.1px; margin-bottom: 3px; }
+.dupe-preview strong { font-weight: 500; font-size: 11px; }
+
+.perfume-card details { border-top: 1px solid var(--line); margin-top: 16px; }
+.perfume-card summary { padding: 12px 0; list-style: none; cursor: pointer; color: var(--pink); font-size: 10px; display: flex; justify-content: space-between; align-items: center; }
+.perfume-card summary::-webkit-details-marker { display: none; }
+.perfume-card summary::after { content: '+'; font-size: 20px; font-weight: 400; }
+.perfume-card details[open] summary::after { content: '−'; }
+.detail-body { padding: 0 0 12px; }
+.detail-body dl { margin: 0; }
+.detail-body dt { font-size: 8px; letter-spacing: 1px; color: var(--pink); text-transform: uppercase; margin-top: 10px; }
+.detail-body dd { margin: 2px 0 0; font-size: 11px; overflow-wrap: anywhere; }
+.shop-link { display: inline-block; margin-top: 14px; color: var(--pink); font-size: 11px; }
+.stock-note { font-size: 10px; color: var(--muted); }
+
+/* "See 7 more details" button on every card */
+.more-btn { display: block; margin: 0 -17px; padding: 13px 17px; background: var(--pink); color: #fff; text-align: center; text-decoration: none; font-size: 11px; font-weight: 600; letter-spacing: .4px; }
+.more-btn:hover { filter: brightness(.92); }
+
+.empty-state { grid-column: 1 / -1; border: 1px dashed var(--line); padding: 45px 20px; text-align: center; background: var(--blush); }
+.empty-state h3 { font: 25px var(--serif); }
+.empty-state p { color: var(--muted); }
+
+/* ---------- 6. About & footer ---------- */
+.about { margin: 52px 0 35px; background: #fff6f8; padding: 28px 34px; display: flex; gap: 28px; }
+.about-symbol { font: 48px var(--serif); color: #b1738c; }
+.about .eyebrow { font-size: 8px; margin-bottom: 7px; }
+.about h2 { font-size: 23px; }
+.about p:not(.eyebrow) { font-size: 11px; color: var(--muted); line-height: 1.8; max-width: 940px; margin-bottom: 0; }
+.about summary { font-size: 11px; color: var(--pink); margin-top: 12px; cursor: pointer; }
+footer { display: flex; justify-content: space-between; align-items: center; min-height: 100px; border-top: 1px solid var(--line); }
+footer .wordmark { font-size: 27px; }
+footer p { font: italic 13px var(--serif); color: var(--muted); }
+footer > a { font-size: 11px; color: var(--pink); text-decoration: none; }
+
+/* ---------- 7. Detail page (perfume.html) ---------- */
+.back-link { display: inline-block; font-size: 12px; font-weight: 600; color: var(--pink); text-decoration: none; margin-bottom: 18px; }
+.detail-hero { display: grid; grid-template-columns: 260px 1fr; gap: 40px; align-items: center; background: #fff6f8; border: 1px solid #f3e6eb; padding: 36px 44px; }
+.detail-art { background: var(--tile, #faf1f3); height: 230px; display: flex; align-items: center; justify-content: center; }
+.detail-art .mini-bottle { transform: rotate(-5deg) scale(1.9); }
+.detail-hero h1 { font-size: clamp(30px, 3.2vw, 44px); margin-bottom: 10px; }
+.detail-hero .brand { font-size: 10px; }
+.vibe { color: var(--muted); font: italic 15px var(--serif); margin: 0 0 18px; }
+.cta-row { display: flex; gap: 12px; flex-wrap: wrap; }
+.btn { display: inline-block; padding: 10px 22px; font-size: 12px; font-weight: 600; text-decoration: none; border: 1px solid var(--pink); background: var(--pink); color: #fff; }
+.btn.secondary { background: #fff; color: var(--pink); }
+
+.detail-panels { display: grid; grid-template-columns: 1fr 1fr; gap: 22px; margin: 26px 0 0; }
+.panel { border: 1px solid var(--line); padding: 24px 28px; }
+.panel h2 { font-size: 22px; margin-bottom: 4px; }
+.panel .sub { font-size: 11px; color: var(--muted); margin: 0 0 8px; }
+.panel dl { margin: 0; }
+.panel dt { font-size: 9px; letter-spacing: 1.2px; color: var(--pink); text-transform: uppercase; margin-top: 14px; }
+.panel dd { margin: 2px 0 0; font-size: 13px; overflow-wrap: anywhere; }
+.panel .stock-note { margin-top: 12px; }
+.other-stores { margin: 8px 0 0; padding-left: 18px; font-size: 12px; }
+
+/* ---------- 8. Compare page (compare.html) ---------- */
+.compare-hero { background: var(--blush); border: 1px solid #f3e6eb; padding: 36px 44px; margin-bottom: 26px; }
+.compare-hero h1 { font-size: clamp(30px, 3.4vw, 46px); margin-bottom: 10px; }
+.compare-hero p:last-child { color: var(--muted); max-width: 520px; margin: 0; }
+.picker { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 14px; }
+.picker label { display: block; font-size: 9px; font-weight: 600; letter-spacing: 1.5px; color: var(--pink); margin-bottom: 6px; }
+.picker select { width: 100%; border: 1px solid var(--line); background: #fff; padding: 11px 12px; font-size: 13px; color: var(--ink); }
+.compare-msg { color: var(--muted); font-size: 12px; min-height: 22px; margin: 0 0 14px; }
+.table-scroll { overflow-x: auto; }
+.compare-table { width: 100%; border-collapse: collapse; min-width: 620px; }
+.compare-table th, .compare-table td { border: 1px solid var(--line); padding: 12px 14px; text-align: left; vertical-align: top; font-size: 13px; }
+.compare-table thead th { background: #fff6f8; font: 400 19px/1.25 var(--serif); }
+.compare-table thead th small { display: block; font: 8px var(--sans); letter-spacing: 1.4px; text-transform: uppercase; color: var(--pink); margin-bottom: 4px; }
+.compare-table tbody th { width: 190px; font-size: 10px; letter-spacing: 1px; text-transform: uppercase; color: var(--muted); background: #fffafb; }
+.compare-table tr.differs td { background: #fdf3f6; }
+.legend { font-size: 11px; color: var(--muted); margin-top: 12px; }
+.legend i { display: inline-block; width: 12px; height: 12px; background: #fdf3f6; border: 1px solid var(--line); vertical-align: middle; margin-right: 6px; }
+
+/* ---------- 9. Responsive ---------- */
+@media (min-width: 1050px) { .perfume-card { min-height: 385px; } }
+@media (max-width: 1049px) {
+  .wrap { padding: 0 26px; }
+  .header-note, .collection-count { display: none; }
+  .hero { grid-template-columns: 1.2fr 1fr; }
+  .hero-copy { padding: 35px 0 30px 30px; }
+  .hero-art { transform: scale(.9); transform-origin: center; }
+  .hero-bottle { left: 15px; }
+  .bottle-front { left: 140px; }
+  .orbit { left: -15px; }
+  .orbit-two { left: 15px; }
+  .art-star { right: 10px; }
+  .perfume-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .detail-panels { grid-template-columns: 1fr; }
+}
+@media (max-width: 600px) {
+  .wrap { padding: 0 18px; }
+  .site-header { height: 80px; }
+  .wordmark { font-size: 30px; }
+  nav { gap: 15px; font-size: 11px; }
+  .hero { display: block; }
+  .hero-copy { padding: 30px 24px 0; }
+  h1 { font-size: 36px; }
+  .hero-link { margin-bottom: 8px; }
+  .hero-art { height: 285px; min-height: 285px; transform: scale(.75); margin: -20px 0; transform-origin: center; }
+  .hero-bottle { left: 55px; top: 40px; }
+  .bottle-front { left: 200px; top: 90px; }
+  .art-caption, .art-bottom, .results-bar > span { display: none; }
+  .orbit { top: 0; left: 20px; }
+  .orbit-two { top: 30px; left: 50px; }
+  .art-star { top: 40px; right: 15px; }
+  .hero-stats { gap: 23px; }
+  .section-heading h2 { font-size: 26px; }
+  .collection { padding-top: 32px; }
+  .search-bar { flex-wrap: wrap; }
+  .search-bar input { width: calc(100% - 48px); flex: 1; }
+  .search-icon { padding-left: 5px; }
+  .search-bar button { flex: 1; }
+  .filters { gap: 6px; }
+  .filter { padding: 6px 12px; }
+  .brand-select, .brand-select select { width: 100%; }
+  .perfume-grid { grid-template-columns: 1fr; gap: 20px; }
+  .card-art { height: 180px; }
+  .card-body h3 { min-height: 0; font-size: 25px; }
+  .notes { min-height: 0; }
+  .about { padding: 23px; gap: 15px; margin-top: 30px; }
+  .about-symbol { font-size: 30px; }
+  footer { flex-wrap: wrap; gap: 12px; padding: 22px 0; }
+  footer p { display: none; }
+  .detail-hero { grid-template-columns: 1fr; padding: 24px; gap: 24px; }
+  .compare-hero { padding: 26px 22px; }
+  .picker { grid-template-columns: 1fr; }
+}
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  * { transition: none !important; }
+}

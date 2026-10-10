@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Sillage PH — Compare perfumes</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="config.js"></script>
+  <script src="compare.js" defer></script>
+</head>
+<body>
+  <header class="site-header wrap">
+    <a class="wordmark" href="index.html">sillage<span> / PH</span></a>
+    <nav aria-label="Main navigation">
+      <a href="index.html#collection">The collection</a>
+      <a href="quiz.html">Scent quiz</a>
+    </nav>
+    <span class="header-note">PERFUME COMPARISON</span>
+  </header>
+
+  <main class="wrap">
+    <section class="compare-hero">
+      <p class="eyebrow">✦ THE COMPARISON</p>
+      <h1>Put two scents <em>side by side.</em></h1>
+      <p>Choose two or three perfumes and see all 14 details in one table. Rows that differ are highlighted.</p>
+    </section>
+
+    <!-- Perfume pickers (filled by compare.js) -->
+    <div class="picker">
+      <div><label for="pickA">PERFUME A</label><select id="pickA"></select></div>
+      <div><label for="pickB">PERFUME B</label><select id="pickB"></select></div>
+      <div><label for="pickC">PERFUME C (OPTIONAL)</label><select id="pickC"></select></div>
+    </div>
+    <p class="compare-msg" id="message" role="status" aria-live="polite">Loading perfumes…</p>
+
+    <div class="table-scroll" id="result"></div>
+  </main>
+
+  <footer class="wrap">
+    <span class="wordmark">sillage<span> / PH</span></span>
+    <p>A little luxury, within reach.</p>
+    <a href="index.html#collection">Back to the collection ↗</a>
+  </footer>
+</body>
+</html>
