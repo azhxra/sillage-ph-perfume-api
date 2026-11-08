@@ -18,4 +18,8 @@ def main():
     print('Seed completed; existing records preserved.')
 
 if __name__ == '__main__':
-    main()
+    try:
+        main()
+    finally:
+        if db.pool is not None:
+            db.pool.close()
