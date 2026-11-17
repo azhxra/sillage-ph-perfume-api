@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Sillage PH — Sign in</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="config.js"></script>
+  <script src="login.js" defer></script>
+</head>
+<body>
+  <header class="site-header wrap">
+    <a class="wordmark" href="index.html">sillage<span> / PH</span></a>
+    <nav aria-label="Main navigation"><a href="index.html#collection">The collection</a><a href="compare.html">Compare</a><a href="quiz.html">Scent quiz</a></nav>
+  </header>
+  <main class="wrap">
+    <section class="auth-panel">
+      <p class="eyebrow">SILLAGE PH ACCOUNTS</p>
+      <h1>Welcome back.</h1>
+      <p class="auth-help">Sign in with your admin or user account. Browsing the collection remains public.</p>
+      <form id="loginForm" class="auth-form">
+        <label for="email">Email</label>
+        <input id="email" name="email" type="email" autocomplete="username" required maxlength="254">
+        <label for="password">Password</label>
+        <input id="password" name="password" type="password" autocomplete="current-password" required>
+        <button type="submit" class="btn">Sign in</button>
+      </form>
+      <p id="authMessage" role="status" aria-live="polite"></p>
+      <section id="account" hidden aria-labelledby="accountTitle">
+        <h2 id="accountTitle">Your account</h2>
+        <p>Signed in as <strong id="accountEmail"></strong></p>
+        <p>Application role: <strong id="accountRole"></strong></p>
+        <p id="roleDescription"></p>
+        <p>For an API demonstration, copy your session token and paste it into the Swagger Authorize dialog as an HTTP bearer token. Keep the token private.</p>
+        <div class="auth-actions">
+          <button class="btn secondary" id="copyToken" type="button">Copy token for API demo</button>
+          <a class="btn secondary" href="/docs" target="_blank" rel="noopener">Open API docs</a>
+          <button class="btn" id="logout" type="button">Sign out</button>
+        </div>
+      </section>
+    </section>
+  </main>
+  <footer class="wrap"><p>A little luxury, within reach.</p></footer>
+</body>
+</html>
