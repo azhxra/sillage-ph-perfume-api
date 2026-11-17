@@ -18,9 +18,14 @@ load_dotenv(Path(__file__).resolve().parent.parent / '.env')
 logger = logging.getLogger(__name__)
 FIELDS = tuple(PerfumeInput.model_fields)
 JSON_FIELDS = {'where_to_buy', 'other_stores'}
-url = os.getenv('DATABASE_URL', '')
-# Supavisor transaction mode requires prepared statements to be disabled.
-pool = ConnectionPool(url, min_size=0, max_size=3, open=True,
+url = os.getenv('DATABASE_URL', '').strip()
+# On Vercel, DATABASE_URL must be configured in the *Production* environment.
+# Keep the entire URL on the server; never copy it into frontend/config.js.
+if not url:
+    logger.error('DATABASE_URL is missing. Set it in Vercel Project Settings -> Environment Variables, then redeploy.')
+# Supabase's transaction pooler is recommended for serverless deployment.
+# Limit each warm function instance to one connection; disable prepared statements.
+pool = ConnectionPool(url, min_size=0, max_size=1, open=True,
     timeout=8, reconnect_timeout=5,
     kwargs={'prepare_threshold': None, 'row_factory': dict_row,
             'connect_timeout': 5, 'sslmode': 'require'},
@@ -30,6 +35,7 @@ pool = ConnectionPool(url, min_size=0, max_size=3, open=True,
 @contextmanager
 def connection():
     if pool is None:
+        logger.error('Database request rejected: missing DATABASE_URL')
         raise HTTPException(503, 'Database unavailable')
     try:
         with pool.connection() as conn:
@@ -115,3 +121,13 @@ def delete(perfume_id):
         record = conn.execute('DELETE FROM public.perfumes WHERE id=%s RETURNING id', (perfume_id,)).fetchone()
     if record is None:
         raise HTTPException(404, 'Perfume not found.')
+
+
+def get_app_user_role(user_id: str):
+    """Look up a real application's role; never trust a role sent by the client."""
+    with connection() as conn:
+        row = conn.execute(
+            'SELECT role FROM public.app_user_roles WHERE user_id = %s',
+            (user_id,),
+        ).fetchone()
+    return row['role'] if row else None

@@ -45,3 +45,8 @@ class PerfumeInput(Model):
     price_php_min: Annotated[int, Field(strict=True, ge=0, le=1000000)]
     where_to_buy: Seller
     other_stores: Annotated[list[OtherStore], Field(max_length=30)] = Field(default_factory=list)
+
+
+class LoginInput(Model):
+    email: Annotated[str, StringConstraints(strict=True, strip_whitespace=True, min_length=3, max_length=254)]
+    password: Annotated[str, StringConstraints(strict=True, min_length=1, max_length=256)]

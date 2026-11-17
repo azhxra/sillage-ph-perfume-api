@@ -1,22 +1,21 @@
 """Sillage PH database-backed API."""
 import logging
 import os
-import secrets
 from pathlib import Path
-from typing import Annotated
 
-from fastapi import Depends, FastAPI, Header, HTTPException, Query, Response
+from fastapi import Depends, FastAPI, HTTPException, Query, Response
 from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse, JSONResponse
 from . import database as db
-from .models import PerfumeInput, Gender, Family, Sort
+from .models import PerfumeInput, Gender, Family, Sort, LoginInput
+from .auth import current_user, require_admin, login as auth_login
 
 app = FastAPI(title="Sillage PH Perfume API", version="3.0.0")
 app.add_middleware(CORSMiddleware,
     allow_origins=[o.strip() for o in os.getenv('ALLOWED_ORIGINS', '').split(',') if o.strip() and o.strip() != '*'],
     allow_credentials=False, allow_methods=['GET', 'POST', 'PUT', 'DELETE'],
-    allow_headers=['Content-Type', 'X-API-Key'])
+    allow_headers=['Content-Type', 'Authorization'])
 
 @app.exception_handler(RequestValidationError)
 async def invalid_request(request, exc):
@@ -27,10 +26,13 @@ async def unexpected_error(request, exc):
     logging.getLogger(__name__).error('Unhandled request error', exc_info=(type(exc), exc, exc.__traceback__))
     return JSONResponse(status_code=500, content={'detail': 'Internal server error'})
 
-def require_admin(x_api_key: Annotated[str | None, Header()] = None):
-    expected = os.getenv('ADMIN_API_KEY', '')
-    if not expected or not x_api_key or not secrets.compare_digest(x_api_key.encode(), expected.encode()):
-        raise HTTPException(401, 'Invalid or missing API key.')
+@app.post('/auth/login', tags=['Accounts'])
+def sign_in(body: LoginInput):
+    return auth_login(body.email, body.password)
+
+@app.get('/auth/me', tags=['Accounts'])
+def account_info(user=Depends(current_user)):
+    return user
 
 @app.get('/')
 def home():
@@ -88,15 +90,15 @@ def delete_perfume(perfume_id: int):
 FRONTEND = Path(__file__).resolve().parent.parent / "frontend"
 
 # Pretty page URLs -> file
-PAGES = {"/catalog": "index.html", "/quiz": "quiz.html", "/compare": "compare.html", "/perfume": "perfume.html"}
+PAGES = {"/catalog": "index.html", "/quiz": "quiz.html", "/compare": "compare.html", "/perfume": "perfume.html", "/login": "login.html"}
 
 # Files the pages are allowed to load (anything else is a 404)
 STATIC_FILES = {
-    "index.html": "text/html", "quiz.html": "text/html", "compare.html": "text/html", "perfume.html": "text/html",
+    "index.html": "text/html", "quiz.html": "text/html", "compare.html": "text/html", "perfume.html": "text/html", "login.html": "text/html",
     "style.css": "text/css",
     "config.js": "application/javascript", "app.js": "application/javascript",
     "quiz.js": "application/javascript", "compare.js": "application/javascript",
-    "perfume.js": "application/javascript",
+    "perfume.js": "application/javascript", "login.js": "application/javascript",
 }
 
 
