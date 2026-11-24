@@ -9,7 +9,7 @@ window.sillageCatalogFetch = async (url, options) => {
     const notice = document.createElement("p");
     notice.id = "catalogPreview";
     notice.className = "preview-notice";
-    notice.textContent = "Preview catalog from the bundled records. Account features require the live database.";
+    notice.textContent = "Showing the saved collection while the live catalog is unavailable. Account features may be temporarily unavailable.";
     const main = document.querySelector("main");
     if (main) main.before(notice);
   }
