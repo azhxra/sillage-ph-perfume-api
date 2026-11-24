@@ -50,3 +50,7 @@ class PerfumeInput(Model):
 class LoginInput(Model):
     email: Annotated[str, StringConstraints(strict=True, strip_whitespace=True, min_length=3, max_length=254)]
     password: Annotated[str, StringConstraints(strict=True, min_length=1, max_length=256)]
+
+
+class SignupInput(LoginInput):
+    password: Annotated[str, StringConstraints(strict=True, min_length=8, max_length=256)]

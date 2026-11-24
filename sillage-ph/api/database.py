@@ -131,3 +131,25 @@ def get_app_user_role(user_id: str):
             (user_id,),
         ).fetchone()
     return row['role'] if row else None
+
+
+def favorites(user_id, perfume_id=None, method='GET'):
+    with connection() as conn:
+        conn.execute("SELECT set_config('sillage.user_id', %s, true)", (user_id,))
+        if method == 'PUT':
+            try:
+                conn.execute(
+                    'INSERT INTO public.favorites (user_id, perfume_id) VALUES (%s, %s) ON CONFLICT DO NOTHING',
+                    (user_id, perfume_id),
+                )
+            except psycopg.errors.ForeignKeyViolation:
+                raise HTTPException(404, 'Perfume or account no longer exists.') from None
+        elif method == 'DELETE':
+            conn.execute('DELETE FROM public.favorites WHERE user_id=%s AND perfume_id=%s', (user_id, perfume_id))
+        else:
+            return conn.execute(
+                'SELECT p.id, p.name, p.brand, p.scent_family FROM public.favorites f '
+                'JOIN public.perfumes p ON p.id=f.perfume_id WHERE f.user_id=%s '
+                'ORDER BY f.created_at DESC, p.id',
+                (user_id,),
+            ).fetchall()

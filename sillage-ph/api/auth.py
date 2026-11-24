@@ -48,6 +48,8 @@ def _supabase_user(access_token: str):
 def _app_identity(token: str):
     user = _supabase_user(token)
     role = db.get_app_user_role(user['id'])
+    if role is None:
+        role = 'user'
     if role not in ('admin', 'user'):
         raise HTTPException(403, 'Account role is not assigned. Contact the site administrator.')
     return {**user, 'role': role}
@@ -97,3 +99,23 @@ def require_admin(user=Depends(current_user)):
     if user['role'] != 'admin':
         raise HTTPException(403, 'Administrator access required.')
     return user
+
+
+def signup(email: str, password: str):
+    base, key = _auth_config()
+    try:
+        response = requests.post(
+            f'{base}/auth/v1/signup',
+            headers={'apikey': key},
+            json={'email': email, 'password': password},
+            timeout=8,
+        )
+    except requests.RequestException:
+        raise HTTPException(503, 'Sign-up temporarily unavailable.') from None
+    if response.status_code == 429:
+        raise HTTPException(429, 'Too many attempts. Try again later.')
+    if response.status_code in (400, 403, 422):
+        raise HTTPException(400, 'Could not create the account. Check your email and password.')
+    if not response.ok:
+        raise HTTPException(503, 'Sign-up temporarily unavailable.')
+    return {'message': 'Account request received. If you receive a confirmation email, confirm your address before signing in.'}
