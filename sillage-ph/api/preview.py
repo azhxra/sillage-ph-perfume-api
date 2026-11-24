@@ -1,4 +1,4 @@
-"""Read-only catalogue for a checkout without DATABASE_URL."""
+"""Read-only catalogue when the live database is unconfigured or unavailable."""
 import json
 
 from seed_data import perfumes
