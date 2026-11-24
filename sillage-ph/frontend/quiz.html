@@ -29,6 +29,8 @@
     header { display: flex; justify-content: space-between; align-items: center; height: 90px; }
     .logo { font: 34px var(--serif); letter-spacing: -1.5px; text-decoration: none; color: var(--ink); }
     .logo span { font: 10px var(--sans); letter-spacing: 2px; margin-left: 8px; color: var(--pink); }
+    .quiz-nav { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 8px 16px; }
+    .preview-notice { padding: 10px 14px; background: #fff2e6; color: #583823; border-radius: 8px; }
     .back { font-size: 12px; font-weight: 600; text-decoration: none; }
 
     .hero { background: var(--blush); border: 1px solid #f3e6eb; padding: 44px; margin-bottom: 32px; }
@@ -65,7 +67,12 @@
   <div class="wrap">
     <header>
       <a class="logo" href="index.html#collection">sillage<span> / PH</span></a>
-      <span><a class="back" href="login.html">Sign in</a> &nbsp; <a class="back" href="index.html#collection">← Back to the collection</a></span>
+      <nav aria-label="Main navigation" class="quiz-nav">
+        <a class="back" href="index.html#collection">Catalog</a>
+        <a class="back" href="compare.html">Compare</a>
+        <a class="back" href="schema.html">Database schema</a>
+        <a class="back" href="login.html">Account</a>
+      </nav>
     </header>
 
     <section class="hero">

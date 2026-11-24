@@ -240,3 +240,41 @@ footer { gap: 24px; margin-top: 40px; padding-top: 24px; padding-bottom: 24px; }
 .auth-panel #authMessage { color: var(--pink); min-height: 24px; }
 .auth-actions { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 18px; }
 @media (max-width: 600px) { .auth-panel { padding: 24px; } }
+
+/* Account and database views */
+[hidden] { display: none !important; }
+.auth-form select, .auth-form textarea {
+  width: 100%; padding: 12px; border: 1px solid var(--line); border-radius: 8px;
+  background: white; color: inherit; font: inherit;
+}
+.auth-form textarea { resize: vertical; font-family: monospace; }
+.favorites-list { padding: 0; list-style: none; }
+.favorites-list li {
+  display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between;
+  gap: 12px; padding: 12px 0; border-bottom: 1px solid var(--line);
+}
+.favorite-button { margin-top: 12px; }
+.favorite-status { display: block; font-size: .85rem; }
+.favorite-status:empty { display: none; }
+.preview-notice { padding: 10px 14px; background: #fff2e6; color: #583823; border-radius: 8px; }
+.schema-intro { max-width: 680px; margin: 44px 0 36px; }
+.schema-intro h1 { font-size: clamp(2rem, 5vw, 3.4rem); }
+.schema-map {
+  display: grid; grid-template-columns: minmax(0,1fr) auto minmax(0,1.2fr) auto minmax(0,1fr);
+  gap: 12px; align-items: center;
+}
+.schema-table { padding: 20px; border: 1px solid #e5d2da; border-radius: 14px; background: #fff; overflow-wrap: anywhere; }
+.schema-focus { background: #fff5f7; border-color: #bf7d93; }
+.schema-name { font-family: monospace; color: #873e58; }
+.schema-table h2 { margin: 4px 0 16px; }
+.schema-table dt { font-weight: 700; }
+.schema-table dd { margin: 0 0 12px; }
+.schema-table small { font-weight: 400; color: #765466; }
+.schema-relation { text-align: center; font-size: .8rem; color: #765466; }
+.schema-relation::after { content: ""; display: block; margin-top: 8px; border-top: 2px solid #bf7d93; }
+.schema-roles { margin: 24px 0 48px; max-width: 520px; }
+@media (max-width: 760px) {
+  .schema-map { grid-template-columns: 1fr; }
+  .schema-relation { margin: 0; }
+  .schema-relation::after { width: 2px; height: 14px; margin: 4px auto 0; background: #bf7d93; }
+}

@@ -66,7 +66,7 @@ async function compare() {
 
   message.textContent = "Comparing…";
   try {
-    const res = await fetch(`${API_URL}/perfumes/compare?ids=${ids.join(",")}`);
+    const res = await window.sillageCatalogFetch(`${API_URL}/perfumes/compare?ids=${ids.join(",")}`);
     if (!res.ok) throw new Error("Request failed");
     const { perfumes } = await res.json();
     drawTable(perfumes);
@@ -101,7 +101,7 @@ function drawTable(perfumes) {
 /* ---------- 5. START ---------- */
 async function start() {
   try {
-    const res = await fetch(`${API_URL}/perfumes`);
+    const res = await window.sillageCatalogFetch(`${API_URL}/perfumes`);
     if (!res.ok) throw new Error("Request failed");
     const { perfumes } = await res.json();
     fillPickers(perfumes);

@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>My account | Sillage PH</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="config.js"></script>
+  <script src="session.js" defer></script>
+  <script src="dashboard.js" defer></script>
+</head>
+<body data-page="account">
+<header class="site-header wrap">
+  <a class="wordmark" href="index.html">sillage<span> / PH</span></a>
+  <nav aria-label="Main navigation">
+    <a href="index.html#collection">Catalog</a><a href="quiz.html">Scent quiz</a>
+    <a href="compare.html">Compare</a><a href="schema.html">Database schema</a>
+    <a href="login.html">Account</a>
+  </nav>
+</header>
+<main class="wrap">
+<section class="auth-panel">
+  <h1>My account</h1>
+  <p id="dashboardMessage" role="status">Checking your session...</p>
+  <a id="signInLink" href="login.html" hidden>Sign in</a>
+  <section id="dashboard" hidden>
+    <p id="identity"></p>
+    <div class="auth-actions">
+      <a href="account.html" id="favoritesLink" hidden>My favorites</a>
+      <a href="admin.html" id="adminLink" hidden>Admin dashboard</a>
+      <button class="btn secondary" id="logout" type="button">Sign out</button>
+    </div>
+    <h2>Saved perfumes</h2>
+    <ul id="favoritesList" class="favorites-list"></ul>
+    <a href="index.html#collection">Browse the catalog</a>
+  </section>
+</section>
+</main>
+</body>
+</html>

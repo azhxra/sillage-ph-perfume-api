@@ -57,7 +57,7 @@ async function showResults() {
   app.textContent = "Finding your scent…";
 
   try {
-    const res = await fetch(`${API}/perfumes`);
+    const res = await window.sillageCatalogFetch(`${API}/perfumes`);
     if (!res.ok) throw new Error("Request failed");
     const { perfumes } = await res.json();
 

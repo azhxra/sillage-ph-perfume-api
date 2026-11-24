@@ -81,7 +81,7 @@ async function loadPerfume() {
     return;
   }
   try {
-    const res = await fetch(`${API_URL}/perfumes/${id}`);
+    const res = await window.sillageCatalogFetch(`${API_URL}/perfumes/${id}`);
     if (res.status === 404) {
       page.innerHTML = `<div class="empty-state"><h3>We couldn’t find that perfume.</h3><p><a href="index.html#collection">Back to the collection</a></p></div>`;
       return;

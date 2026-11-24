@@ -32,7 +32,7 @@ function safeShopURL(value) {
 }
 
 async function fetchJSON(path, signal) {
-  const response = await fetch(`${API_URL}${path}`, { signal });
+  const response = await window.sillageCatalogFetch(`${API_URL}${path}`, { signal });
   if (!response.ok) throw new Error(`API returned HTTP ${response.status}`);
   return response.json();
 }
@@ -91,6 +91,17 @@ function buildGrid(perfumes) {
   grid.className = "perfume-grid";
   perfumes.forEach(perfume => grid.appendChild(buildCard(perfume)));
   return grid;
+}
+
+let favoriteRequest;
+function readFavorites() {
+  favoriteRequest ??= window.sillageSession.request("/auth/favorites").then(
+    data => new Set(data.perfumes.map(perfume => perfume.id))
+  ).catch(error => {
+    favoriteRequest = undefined;
+    throw error;
+  });
+  return favoriteRequest;
 }
 
 function buildCard(p) {
@@ -157,6 +168,55 @@ function buildCard(p) {
   card.querySelectorAll("a").forEach(link => {
     link.addEventListener("click", event => event.stopPropagation());
   });
+  if (!document.querySelector("#catalogPreview")) {
+    const button = document.createElement("button");
+    const status = document.createElement("span");
+    button.type = "button";
+    button.className = "btn secondary favorite-button";
+    status.className = "favorite-status";
+    status.setAttribute("role", "status");
+    const session = window.sillageSession;
+    const render = saved => {
+      button.setAttribute("aria-pressed", String(saved));
+      button.textContent = saved ? "Remove from favorites" : "Add to favorites";
+    };
+    render(false);
+    if (session.token()) {
+      button.disabled = true;
+      readFavorites().then(ids => render(ids.has(p.id))).catch(error => {
+        status.textContent = error.message;
+      }).finally(() => { button.disabled = false; });
+    }
+    button.addEventListener("click", async event => {
+      event.stopPropagation();
+      if (!session.token()) {
+        location.href = "login.html?from=catalog";
+        return;
+      }
+      button.disabled = true;
+      status.textContent = "";
+      try {
+        const ids = await readFavorites();
+        const saved = ids.has(p.id);
+        await session.request("/auth/favorites/" + p.id, {method: saved ? "DELETE" : "PUT"});
+        if (saved) ids.delete(p.id);
+        else ids.add(p.id);
+        render(!saved);
+        // A search can replace this card while the save is in flight.
+        document.querySelectorAll('[data-favorite-id="' + p.id + '"]').forEach(other => {
+          other.setAttribute("aria-pressed", String(!saved));
+          other.textContent = button.textContent;
+        });
+        status.textContent = saved ? "Removed from favorites." : "Saved to favorites.";
+      } catch (error) {
+        status.textContent = error.message;
+      } finally {
+        button.disabled = false;
+      }
+    });
+    button.dataset.favoriteId = p.id;
+    card.querySelector(".card-body").append(button, status);
+  }
   return card;
 }
 

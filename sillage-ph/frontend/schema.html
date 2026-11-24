@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Database schema | Sillage PH</title>
+  <link rel="stylesheet" href="style.css">
+
+</head>
+<body >
+<header class="site-header wrap">
+  <a class="wordmark" href="index.html">sillage<span> / PH</span></a>
+  <nav aria-label="Main navigation">
+    <a href="index.html#collection">Catalog</a><a href="quiz.html">Scent quiz</a>
+    <a href="compare.html">Compare</a><a href="schema.html">Database schema</a>
+    <a href="login.html">Account</a>
+  </nav>
+</header>
+<main class="wrap">
+<section class="schema-intro">
+  <h1>How Sillage PH stores favorites</h1>
+  <p>One user can save many perfumes. Each favorite connects one user and one perfume, and a user can save each perfume once.</p>
+  <a class="btn" href="index.html#collection">Try Add to favorites</a>
+</section>
+<section class="schema-map" aria-label="Favorites database relationships">
+  <article class="schema-table">
+    <span class="schema-name">auth.users</span><h2>Users</h2>
+    <dl><dt>id <small>Primary key</small></dt><dd>Account UUID</dd>
+    <dt>email</dt><dd>Sign-in address</dd></dl>
+  </article>
+  <p class="schema-relation">One user<br>to many favorites</p>
+  <article class="schema-table schema-focus">
+    <span class="schema-name">public.favorites</span><h2>Favorites</h2>
+    <dl><dt>user_id <small>Foreign key</small></dt><dd>References auth.users.id</dd>
+    <dt>perfume_id <small>Foreign key</small></dt><dd>References public.perfumes.id</dd>
+    <dt>created_at</dt><dd>Time the perfume was saved</dd></dl>
+    <p><strong>Primary key</strong><br><code>(user_id, perfume_id)</code></p>
+  </article>
+  <p class="schema-relation">Many favorites<br>to one perfume</p>
+  <article class="schema-table">
+    <span class="schema-name">public.perfumes</span><h2>Perfumes</h2>
+    <dl><dt>id <small>Primary key</small></dt><dd>Perfume record ID</dd>
+    <dt>brand, name</dt><dd>Catalog identity</dd>
+    <dt>scent_family, key_notes</dt><dd>Scent information</dd></dl>
+  </article>
+</section>
+<section class="schema-table schema-roles">
+  <span class="schema-name">public.app_user_roles</span><h2>Account roles</h2>
+  <dl><dt>user_id <small>Primary and foreign key</small></dt><dd>References auth.users.id. Each user can have one explicit role.</dd>
+  <dt>role</dt><dd>Defaults to user in the app. An assigned admin role grants catalog management.</dd></dl>
+</section>
+</main>
+</body>
+</html>
