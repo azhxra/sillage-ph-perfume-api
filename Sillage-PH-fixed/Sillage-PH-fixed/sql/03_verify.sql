@@ -1,5 +1,0 @@
--- Read-only verification in Supabase SQL Editor. Expected: five public application tables and seven FKs.
-SELECT table_name FROM information_schema.tables WHERE table_schema='public' AND table_name IN ('users','app_user_roles','scent_families','perfumes','perfume_favorites') ORDER BY table_name;
-SELECT conrelid::regclass AS child, conname, pg_get_constraintdef(oid) AS definition FROM pg_constraint WHERE contype='f' AND conrelid IN ('public.users'::regclass,'public.app_user_roles'::regclass,'public.perfumes'::regclass,'public.perfume_favorites'::regclass) ORDER BY 1,2;
-SELECT (SELECT count(*) FROM public.perfumes) AS perfumes,(SELECT count(*) FROM public.scent_families) AS families,(SELECT count(*) FROM public.perfume_favorites) AS favorites,(SELECT count(*) FROM auth.users a LEFT JOIN public.users u ON u.id=a.id WHERE u.id IS NULL) AS missing_profiles,(SELECT count(*) FROM auth.users a LEFT JOIN public.app_user_roles r ON r.user_id=a.id WHERE r.user_id IS NULL) AS missing_roles;
-SELECT schemaname,tablename,policyname,roles,cmd FROM pg_policies WHERE schemaname='public' AND tablename IN ('users','app_user_roles','scent_families','perfumes','perfume_favorites');
