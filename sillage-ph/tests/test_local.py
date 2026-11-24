@@ -116,6 +116,43 @@ class Contracts(unittest.TestCase):
                 self.assertEqual(raised.exception.status_code,status)
                 self.assertNotIn('private',raised.exception.detail)
 
+    def test_configured_database_outage_keeps_public_catalog_available(self):
+        with patch.object(db, 'pool', object()):
+            for operation in ['list_perfumes', 'compare', 'get_perfume']:
+                with patch.object(db, operation, side_effect=HTTPException(503, 'Database unavailable')):
+                    paths = ['/perfumes', '/perfumes/search?q=Dior', '/perfumes?gender=Women&sort=price_desc'] if operation == 'list_perfumes' else ['/perfumes/compare?ids=2,1'] if operation == 'compare' else ['/perfumes/1']
+                    for path in paths:
+                        with self.subTest(path=path):
+                            response = self.client.get(path)
+                            self.assertEqual(response.status_code, 200)
+                            self.assertEqual(response.headers['X-Sillage-Preview'], '1')
+                            self.assertEqual(response.headers['Cache-Control'], 'no-store')
+                            data = response.json()
+                            if path == '/perfumes':
+                                self.assertEqual(data['count'], 25)
+                            elif 'search' in path:
+                                self.assertTrue(data['results'])
+                                self.assertTrue(all('dior' in p['brand'].lower() for p in data['results']))
+                            elif 'gender' in path:
+                                self.assertTrue(all(p['gender'] == 'Women' for p in data['perfumes']))
+                                prices = [p['price_php_min'] for p in data['perfumes']]
+                                self.assertEqual(prices, sorted(prices, reverse=True))
+                            elif 'compare' in path:
+                                self.assertEqual([p['id'] for p in data['perfumes']], [2, 1])
+                            else:
+                                self.assertEqual(data['id'], 1)
+            # The next successful read returns current database records immediately.
+            with patch.object(db, 'list_perfumes', return_value=perfumes[:1]):
+                response = self.client.get('/perfumes')
+                self.assertEqual(response.json()['count'], 1)
+                self.assertNotIn('X-Sillage-Preview', response.headers)
+
+    def test_outage_does_not_simulate_successful_writes_or_health(self):
+        app.dependency_overrides[current_user] = lambda: {'role': 'admin'}
+        with patch.object(db, 'pool', object()), patch.object(db, 'health', side_effect=HTTPException(503)), patch.object(db, 'create', side_effect=HTTPException(503)):
+            self.assertEqual(self.client.get('/health').status_code, 503)
+            self.assertEqual(self.client.post('/perfumes', json=self.body).status_code, 503)
+
     def test_database_search_parameterized(self):
         conn=MagicMock()
         conn.execute.return_value.fetchall.return_value=[]
