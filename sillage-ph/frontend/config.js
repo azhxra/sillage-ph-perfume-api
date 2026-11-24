@@ -129,18 +129,6 @@ window.sillageApiBase =
       return;
     }
 
-    if (existing) return;
-
-    const message = document.createElement("p");
-    message.id = "catalogPreview";
-    message.className = "preview-notice";
-    message.setAttribute("role", "status");
-
-    message.textContent =
-      "Preview mode: showing the original 25 perfumes while the live API is unavailable. Prices may be outdated. Account features require the live backend.";
-
-    const main = document.querySelector("main");
-
     if (main) {
       main.before(message);
     } else {
