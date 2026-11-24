@@ -1,0 +1,16 @@
+DATABASE_URL is missing. Set it in Vercel Project Settings -> Environment Variables, then redeploy.
+test_local (unittest.loader.ModuleSkipped.test_local) ... skipped 'Psycopg is not installed; use test_preview.py for offline contracts'
+test_auth_and_admin (test_preview.PreviewContracts.test_auth_and_admin) ... ok
+test_favorites_identity (test_preview.PreviewContracts.test_favorites_identity) ... ok
+test_filters (test_preview.PreviewContracts.test_filters) ... ok
+test_outage_recovery (test_preview.PreviewContracts.test_outage_recovery) ... ok
+test_pages (test_preview.PreviewContracts.test_pages) ... ok
+test_preview (test_preview.PreviewContracts.test_preview) ... Database request rejected: missing DATABASE_URL
+ok
+test_seed (test_preview.PreviewContracts.test_seed) ... ok
+test_validation (test_preview.PreviewContracts.test_validation) ... ok
+
+----------------------------------------------------------------------
+Ran 9 tests in 0.066s
+
+OK (skipped=1)
