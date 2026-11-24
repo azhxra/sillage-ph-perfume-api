@@ -12,6 +12,7 @@ from fastapi.testclient import TestClient
 from fastapi import HTTPException
 import psycopg
 from api.index import app
+from api.auth import current_user
 from api import database as db
 from api.models import PerfumeInput
 from seed_data import perfumes
@@ -19,15 +20,13 @@ from seed_data import perfumes
 
 class Contracts(unittest.TestCase):
     def setUp(self):
-        self.env = patch.dict(os.environ, {'ADMIN_API_KEY':'local-test-only'})
-        self.env.start()
         self.client = TestClient(app, raise_server_exceptions=False)
         self.body = {k:v for k,v in copy.deepcopy(perfumes[0]).items() if k != 'id'}
-        self.auth = {'X-API-Key':'local-test-only'}
+        self.auth = {'Authorization':'Bearer local-test-only'}
 
     def tearDown(self):
         self.client.close()
-        self.env.stop()
+        app.dependency_overrides.pop(current_user, None)
 
     def test_all_seed_records_valid_and_unique(self):
         self.assertEqual(len(perfumes),25)
@@ -36,7 +35,7 @@ class Contracts(unittest.TestCase):
             PerfumeInput.model_validate({k:v for k,v in p.items() if k != 'id'})
 
     def test_frontend_files(self):
-        for path in ['/catalog','/perfume','/compare','/quiz','/style.css','/config.js','/app.js','/perfume.js','/compare.js','/quiz.js']:
+        for path in ['/catalog','/perfume','/compare','/quiz','/style.css','/config.js','/app.js','/perfume.js','/compare.js','/quiz.js','/login','/account','/admin','/schema','/session.js','/dashboard.js']:
             with self.subTest(path=path):
                 self.assertEqual(self.client.get(path).status_code,200)
         self.assertEqual(self.client.get('/.env').status_code,404)
@@ -45,10 +44,11 @@ class Contracts(unittest.TestCase):
         for method,path in [('post','/perfumes'),('put','/perfumes/1'),('delete','/perfumes/1')]:
             for headers in [{},{'X-API-Key':'wrong'}]:
                 self.assertEqual(self.client.request(method,path,headers=headers,json=self.body).status_code,401)
-        with patch.dict(os.environ, {'ADMIN_API_KEY':''}):
-            self.assertEqual(self.client.post('/perfumes',headers=self.auth,json=self.body).status_code,401)
+        app.dependency_overrides[current_user] = lambda: {'role': 'user'}
+        self.assertEqual(self.client.post('/perfumes',headers=self.auth,json=self.body).status_code,403)
 
     def test_invalid_bodies(self):
+        app.dependency_overrides[current_user] = lambda: {'role': 'admin'}
         cases=[{}, {**self.body,'name':'  '}, {**self.body,'brand':123}, {**self.body,'year_launched':True},
             {**self.body,'year_launched':1899}, {**self.body,'year_launched':9999}, {**self.body,'price_php_min':'450'},
             {**self.body,'gender':'invalid'}, {**self.body,'scent_family':'invalid'}, {**self.body,'key_notes':[]},
@@ -64,17 +64,18 @@ class Contracts(unittest.TestCase):
     def test_named_routes_and_queries(self):
         for path in ['/perfumes/search?q=%20','/perfumes/compare?ids=1','/perfumes/compare?ids=1,1','/perfumes/compare?ids=a,b','/perfumes?gender=Other','/perfumes?sort=unknown']:
             self.assertEqual(self.client.get(path).status_code,422)
-        with patch.object(db,'list_perfumes',return_value=perfumes) as operation:
+        with patch.object(db,'pool',object()), patch.object(db,'list_perfumes',return_value=perfumes) as operation:
             self.assertEqual(self.client.get('/perfumes').json(),{'count':25,'perfumes':perfumes})
             self.client.get('/perfumes?gender=Men&scent_family=Fresh&sort=price_desc')
-            operation.assert_called_with('Men','Fresh','price_desc')
+            operation.assert_called_with(gender='Men', scent_family='Fresh', sort='price_desc')
             self.assertEqual(self.client.get('/perfumes/search?q=Dior').json()['results'],perfumes)
             operation.assert_called_with(query='Dior')
-        with patch.object(db,'compare',return_value=perfumes[:2]) as operation:
+        with patch.object(db,'pool',object()), patch.object(db,'compare',return_value=perfumes[:2]) as operation:
             self.assertEqual(self.client.get('/perfumes/compare?ids=2,1').status_code,200)
             operation.assert_called_once_with([2,1])
 
     def test_writes_delegate_validated_data(self):
+        app.dependency_overrides[current_user] = lambda: {'role': 'admin'}
         with patch.object(db,'create',return_value=perfumes[0]) as operation:
             response=self.client.post('/perfumes',headers=self.auth,json=self.body)
             self.assertEqual(response.status_code,201)
@@ -89,11 +90,18 @@ class Contracts(unittest.TestCase):
         with patch.object(db,'pool',None):
             self.assertEqual(self.client.get('/health').json(),{'detail':'Database unavailable'})
             self.assertEqual(self.client.get('/health').status_code,503)
-            self.assertEqual(self.client.get('/perfumes').status_code,503)
+            response = self.client.get('/perfumes')
+            self.assertEqual(response.status_code, 200)
+            self.assertEqual(response.headers['X-Sillage-Preview'], '1')
+            self.assertEqual(response.json()['count'], len(perfumes))
+            self.assertEqual(self.client.get('/perfumes/1').status_code, 200)
+            self.assertEqual(self.client.get('/perfumes/search?q=Dior').status_code, 200)
+            compared = self.client.get('/perfumes/compare?ids=2,1').json()['perfumes']
+            self.assertEqual([p['id'] for p in compared], [2,1])
         for status,detail in [(404,'Perfume not found.'),(409,'Duplicate')]:
-            with patch.object(db,'get_perfume',side_effect=HTTPException(status,detail)):
+            with patch.object(db,'pool',object()), patch.object(db,'get_perfume',side_effect=HTTPException(status,detail)):
                 self.assertEqual(self.client.get('/perfumes/1').status_code,status)
-        with patch.object(db,'get_perfume',side_effect=RuntimeError('private database details')):
+        with patch.object(db,'pool',object()), patch.object(db,'get_perfume',side_effect=RuntimeError('private database details')):
             response=self.client.get('/perfumes/1')
             self.assertEqual(response.status_code,500)
             self.assertEqual(response.json(),{'detail':'Internal server error'})
@@ -118,6 +126,20 @@ class Contracts(unittest.TestCase):
             statement,params=conn.execute.call_args.args
             self.assertNotIn(needle,statement.as_string())
             self.assertEqual(params,[needle])
+
+    def test_favorites_use_authenticated_identity(self):
+        self.assertEqual(self.client.get('/auth/favorites').status_code, 401)
+        self.assertEqual(self.client.put('/auth/favorites/1').status_code, 401)
+        self.assertEqual(self.client.delete('/auth/favorites/1').status_code, 401)
+        owner = '3058b2c2-2183-4cb4-851c-62597517c2ab'
+        app.dependency_overrides[current_user] = lambda: {'id': owner, 'role': 'user'}
+        with patch.object(db, 'favorites', return_value=[]) as operation:
+            self.assertEqual(self.client.get('/auth/favorites').json(), {'perfumes': []})
+            operation.assert_called_with(owner)
+            self.assertEqual(self.client.put('/auth/favorites/1').status_code, 204)
+            operation.assert_called_with(owner, 1, 'PUT')
+            self.assertEqual(self.client.delete('/auth/favorites/1').status_code, 204)
+            operation.assert_called_with(owner, 1, 'DELETE')
 
     def test_cors(self):
         response=self.client.options('/perfumes',headers={'Origin':'https://unconfigured.example','Access-Control-Request-Method':'POST'})
