@@ -20,23 +20,24 @@
 <section class="schema-intro">
   <h1>Sillage PH database schema</h1>
   <p>Users, account roles, perfumes, and favorites are stored separately. The relationships below show how they connect.</p>
+  <p class="preview-notice">This diagram includes the separate Users table prepared in <code>sql/users.sql</code>. Apply that migration in Supabase before using this diagram as evidence of the live database.</p>
   <nav class="schema-jump" aria-label="Schema sections"><a href="#users">Users &amp; account roles</a><a href="#favorites">Favorites &amp; perfumes</a></nav>
 </section>
 <section id="users" class="schema-section" aria-labelledby="users-title">
   <h2 id="users-title">Users &amp; account roles</h2>
-  <p>The users table is <code>auth.users</code>, managed by Supabase Authentication. It is in the <strong>auth</strong> schema, separate from the application tables in <strong>public</strong>. View accounts in Supabase under <strong>Authentication → Users</strong>.</p>
+  <p><code>public.users</code> is the application's separate users table. Each ID references <code>auth.users.id</code>; Supabase Authentication handles sign-in. Email addresses are synchronized from Auth and are not accessible through the public API.</p>
   <div class="schema-map schema-account-map">
   <article class="schema-table">
-    <span class="schema-name">auth.users</span><h3>Users</h3>
-    <dl><dt>id <small>Primary key</small></dt><dd>Account UUID</dd>
+    <span class="schema-name">public.users</span><h3>Users</h3>
+    <dl><dt>id <small>Primary and foreign key · uuid</small></dt><dd>References auth.users.id</dd>
     <dt>email</dt><dd>Sign-in address</dd>
     <dt>created_at</dt><dd>Account creation time</dd></dl>
-    <p>Selected fields shown. Supabase Auth manages password hashes and sign-in; passwords are never displayed here.</p>
+    <p>One profile per Auth account. Passwords stay in Supabase Auth.</p>
   </article>
   <p class="schema-relation">One user<br>to zero or one role record</p>
   <article class="schema-table">
     <span class="schema-name">public.app_user_roles</span><h3>Account roles</h3>
-    <dl><dt>user_id <small>Primary and foreign key · uuid</small></dt><dd>References auth.users.id</dd>
+    <dl><dt>user_id <small>Primary and foreign key · uuid</small></dt><dd>References public.users.id and auth.users.id</dd>
     <dt>role <small>text</small></dt><dd>Allowed values: admin or user</dd>
     <dt>created_at <small>timestamptz</small></dt><dd>Time the role record was created</dd></dl>
     <p>If no role record exists, the app treats the account as a user. An assigned admin role grants catalog management.</p>
@@ -45,17 +46,17 @@
 </section>
 <section id="favorites" class="schema-section" aria-labelledby="favorites-title">
   <h2 id="favorites-title">Favorites &amp; perfumes</h2>
-  <p>Users and perfumes have a many-to-many relationship through favorites. Each user can save a particular perfume only once.</p>
+  <p>Favorites connect an account role record to a perfume. Each account can save a particular perfume only once.</p>
   <div class="schema-map">
   <article class="schema-table">
-    <span class="schema-name">auth.users</span><h3>User reference</h3>
-    <dl><dt>id <small>Primary key · uuid</small></dt><dd>References the same users table shown above.</dd></dl>
+    <span class="schema-name">public.app_user_roles</span><h3>Account reference</h3>
+    <dl><dt>user_id <small>Primary key · uuid</small></dt><dd>Connects to the users table shown above.</dd></dl>
     <a href="#users">View users table</a>
   </article>
   <p class="schema-relation">One user<br>to zero or many favorites</p>
   <article class="schema-table schema-focus">
-    <span class="schema-name">public.favorites</span><h3>Favorites</h3>
-    <dl><dt>user_id <small>Foreign key</small></dt><dd>References auth.users.id</dd>
+    <span class="schema-name">public.perfume_favorites</span><h3>Favorites</h3>
+    <dl><dt>user_id <small>Foreign key</small></dt><dd>References public.app_user_roles.user_id</dd>
     <dt>perfume_id <small>Foreign key</small></dt><dd>References public.perfumes.id</dd>
     <dt>created_at</dt><dd>Time the perfume was saved</dd></dl>
     <p><strong>Primary key</strong><br><code>(user_id, perfume_id)</code></p>
@@ -65,10 +66,18 @@
     <span class="schema-name">public.perfumes</span><h3>Perfumes</h3>
     <dl><dt>id <small>Primary key</small></dt><dd>Perfume record ID</dd>
     <dt>brand, name</dt><dd>Catalog identity</dd>
-    <dt>scent_family, key_notes</dt><dd>Scent information</dd></dl>
+    <dt>scent_family <small>Foreign key</small></dt><dd>References public.scent_families.name</dd>
+    <dt>key_notes</dt><dd>Scent information</dd>
+    <dt>created_by <small>Optional foreign key · uuid</small></dt><dd>References public.app_user_roles.user_id</dd></dl>
   </article>
   </div>
-  <p>Deleting an account removes its favorites and role record. Deleting a perfume removes its favorites, as defined by the foreign keys.</p>
+  <p>Each perfume may have one creator account. One account can create many perfumes. The supplied Supabase schema does not declare cascading deletes for perfumes or favorites.</p>
+  <article class="schema-table">
+    <span class="schema-name">public.scent_families</span><h3>Scent families</h3>
+    <dl><dt>name <small>Primary key</small></dt><dd>Scent family name</dd>
+    <dt>description</dt><dd>Family description</dd></dl>
+    <p>One scent family can describe many perfumes. Each perfume references one family.</p>
+  </article>
 </section>
 </main>
 </body>
